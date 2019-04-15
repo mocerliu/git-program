@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>问卷调差</title>
+
+
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+
+    <style>
+        .InDisable{
+            cursor: default;
+            pointer-events: none;
+            display: none;
+            /* background-color: dimgray; */
+        }
+        .notInDisable{
+            cursor: pointer;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" v-cloak>
+        <div v-model="qusList">
+            <q-component :quslist="qusList"></q-component>
+        </div>
+    </div>
+
+
+    <script type="text/javascript"> 
+        Vue.component('q-component',{
+            props:['quslist'],
+
+            template:`
+            <div class="q-component">
+                <div class="q-tabs"
+                    v-for="(q,index) in quslist"
+                    v-show="show === index">
+                    <from @submit.prevent="submit">
+                    <div class="q-question">{{ index+1 }}.{{ q.question }}</div>
+                    <div class="q-content"
+                        v-for="(value,idx) in q.values"> 
+                        <div v-if="q.qtype === 'radio'">
+                            <input :type="q.qtype" :value="value" :name="index">
+                            <label :for="value">{{ idx+1 }}.{{ value }}</label>
+                        </div>
+                        <div v-else-if="q.qtype === 'email'">
+                            <input type="q.qtype" placeholder="请输入邮箱">
+                        </div>
+
+                    </div>
+                    <div class="up">
+                        <button
+                            type="submit" value="submit"
+                            >交卷</button>
+                    </div>
+                    </from>
+                </div>
+                <div class=button-tabs>
+                    <div class="before-question">
+                        <button
+                        :class="beforeBtnCls(this.show)"
+                        @click="beforeQuestion">上一题</button>
+                    </div>
+                    <div class="after-question">
+                        <button
+                        :class="afterBtnCls(this.show)"
+                        @click="afterQuestion">下一题</button>                    
+                    </div>
+                    
+                </div>
+            </div>
+            `,
+            data:function(){
+                return {
+                    show:0
+                }
+            },
+            methods:{
+                beforeBtnCls(){
+                    if(this.show === 0){
+                        return 'InDisable'
+                    }else{
+                        return 'notInDisable'
+                    }
+                },
+                afterBtnCls(){
+                    if(this.show === this.quslist.length-1){
+                        return 'InDisable'
+                    }else{
+                        return 'notInDisable'
+                    }
+                },
+                beforeQuestion(){
+                    if(this.show > 0){
+                        this.show--;
+                    }else{
+                        return false;
+                    }
+                },
+                afterQuestion(){
+                    if(this.show < this.quslist.length-1){
+                        this.show ++;
+                    }else{
+                        return false;
+                    }
+                },
+                submit: function() {
+                       console.log()
+                    }
+                
+            },
+            watch:{
+                show(){
+                    console.log('show is changed! show:',this.show);
+                }
+            }
+        });
+        var app = new Vue({
+            el:'#app',
+            data:{
+                activeKey:'1',
+                qusList: [
+                    {
+                    question:'请问您的性别是:',
+                    values:['男','女'],
+                    qnode:'input',
+                    qtype:'radio'
+
+                },{
+                    question:'请问您的职业是',
+                    values:['Student','Other'],
+                    qnode:'input',
+                    qtype:'radio'
+                },{
+                    question:'请输入您的邮箱，五元玛莎拉蒂抵用券将会发送到邮箱地址',
+                    values:[''],
+                    qnode:'input',
+                    qtype:'email'
+                }]
+            }
+        })
+    </script>
+</body>
+</html>
